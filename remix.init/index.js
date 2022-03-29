@@ -4,7 +4,6 @@ const fs = require("fs/promises");
 const path = require("path");
 const inquirer = require("inquirer");
 
-const toml = require("@iarna/toml");
 const sort = require("sort-package-json");
 
 function escapeRegExp(string) {
@@ -18,12 +17,11 @@ function getRandomString(length) {
 
 async function main({ rootDirectory }) {
   const README_PATH = path.join(rootDirectory, "README.md");
-  const FLY_TOML_PATH = path.join(rootDirectory, "fly.toml");
   const EXAMPLE_ENV_PATH = path.join(rootDirectory, ".env.example");
   const ENV_PATH = path.join(rootDirectory, ".env");
   const PACKAGE_JSON_PATH = path.join(rootDirectory, "package.json");
 
-  const REPLACER = "indie-stack-template";
+  const REPLACER = "the-beatles-stack-template";
 
   const DIR_NAME = path.basename(rootDirectory);
   const SUFFIX = getRandomString(2);
@@ -33,7 +31,6 @@ async function main({ rootDirectory }) {
     .replace(/[^a-zA-Z0-9-_]/g, "-");
 
   const [prodContent, readme, env, packageJson] = await Promise.all([
-    fs.readFile(FLY_TOML_PATH, "utf-8"),
     fs.readFile(README_PATH, "utf-8"),
     fs.readFile(EXAMPLE_ENV_PATH, "utf-8"),
     fs.readFile(PACKAGE_JSON_PATH, "utf-8"),
@@ -43,9 +40,6 @@ async function main({ rootDirectory }) {
     /^SESSION_SECRET=.*$/m,
     `SESSION_SECRET="${getRandomString(16)}"`
   );
-
-  const prodToml = toml.parse(prodContent);
-  prodToml.app = prodToml.app.replace(REPLACER, APP_NAME);
 
   const newReadme = readme.replace(
     new RegExp(escapeRegExp(REPLACER), "g"),
@@ -60,7 +54,6 @@ async function main({ rootDirectory }) {
     ) + "\n";
 
   await Promise.all([
-    fs.writeFile(FLY_TOML_PATH, toml.stringify(prodToml)),
     fs.writeFile(README_PATH, newReadme),
     fs.writeFile(ENV_PATH, newEnv),
     fs.writeFile(PACKAGE_JSON_PATH, newPackageJson),
@@ -85,25 +78,6 @@ async function main({ rootDirectory }) {
 Start development with \`npm run dev\`
     `.trim()
   );
-}
-
-async function askSetupQuestions({ rootDirectory }) {
-  const answers = await inquirer.prompt([
-    {
-      name: "validate",
-      type: "confirm",
-      default: false,
-      message:
-        "Do you want to run the build/tests/etc to verify things are setup properly?",
-    },
-  ]);
-
-  if (answers.validate) {
-    console.log(
-      `Running the validate script to make sure everything was set up properly`
-    );
-    execSync(`npm run validate`, { stdio: "inherit", cwd: rootDirectory });
-  }
 }
 
 module.exports = main;
