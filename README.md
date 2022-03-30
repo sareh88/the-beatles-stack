@@ -29,7 +29,8 @@ npx create-remix --template sareh88/the-beatles-stack
 
 This is a pretty simple starter template,
 
-- new remix project with tailwind.
+- simple remix project with tailwind.
+- ideal for some use cases where you want to server rendering your client,but also still keep you backend and APIs are the same.
 
 ## Deployment
 
