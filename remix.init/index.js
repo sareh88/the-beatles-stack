@@ -49,8 +49,7 @@ async function main({ rootDirectory }) {
     fs.writeFile(PACKAGE_JSON_PATH, newPackageJson),
   ]);
 
-  execSync(`npm run dev`, { stdio: "inherit", cwd: rootDirectory });
-
+  execSync(`npm run build`, { stdio: "inherit", cwd: rootDirectory });
   // TODO: There is currently an issue with the test cleanup script that results
   // in an error when running Cypress in some cases. Add this question back
   // when this is fixed.
@@ -63,7 +62,7 @@ async function main({ rootDirectory }) {
   // });
 
   console.log(
-    `Setup is complete. Project is running
+    `Setup is complete.
 
 Start development with \`npm run dev\`
     `.trim()
